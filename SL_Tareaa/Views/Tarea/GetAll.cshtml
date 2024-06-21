@@ -1,0 +1,352 @@
+﻿@model ML.Tarea
+@{
+    ViewData["Title"] = "List Task";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom, #000000, #2f4b40); /* Color de fondo deseado */
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .task {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .task-description {
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .task-due {
+            color: #ff6600;
+            font-weight: bold;
+        }
+
+        .task-label {
+            background-color: #007bff;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .task-container {
+            overflow-y: auto; /* Agrega una barra de desplazamiento vertical */
+            max-height: 400px; /* Establece la altura máxima del contenedor para mostrar la barra de desplazamiento */
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .faded-button {
+            opacity: 1;
+            transition: opacity 0.3s ease; /* Establece una transición de 0.3 segundos */
+        }
+
+            .faded-button:hover {
+                opacity: 0.7; /* Reduce la opacidad al pasar el cursor sobre el botón */
+            }
+
+        .custom-button {
+            background-color: #589b81; 
+            color: black; /* Color del texto */
+            border: none; /* Elimina el borde */
+        }
+
+            .custom-button:hover {
+                background-color: #6ec6a4; /* Cambia el color al pasar el cursor */
+            }
+    </style>
+
+    
+
+    <div>
+        @using (Html.BeginForm("GetAll", "Tarea", FormMethod.Get, new { enctype = "multipart/form-data" }))
+        {
+            <div class="input-group mb-3" style="max-width: 300px;">
+                <select class="form-control" id="IdEstado" name="idEstado" style="width: 60%;">
+                    <option value="">Escoje una opcion</option>
+                    <option value="">Todos</option>
+                    <option value="1">Importante</option>
+                    <option value="2">Pendiente</option>
+                    <option value="3">Completada</option>
+                </select>
+                <div class="input-group-append" style="width: 40%;">
+                    <button type="submit" class="btn custom-button" style="width: 50%;">Filtrar</button>
+                </div>
+            </div>
+        }
+    </div>
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>To-Do list</h2>
+
+                <div class="task-container">
+
+                   
+                    @foreach (ML.Tarea tarea in Model.LisTareas)
+                    {
+
+                        <div class="task" id="task_@tarea.IdTarea" style="position: relative;">
+
+
+
+
+                            <!-- Cuadro de selección verde -->
+                            <div class="form-check form-check-inline" style="position: absolute;top: 2px; right: 300px;" title="completada">
+                                <input class="form-check-input" type="checkbox" id="seleccionadoVerde_@tarea.IdTarea" style="background-color: green; width: 20px; height: 20px; border: none;" data-idestado="3" onchange="guardarEstado(this)">
+                            </div>
+                            <!-- Cuadro de selección amarillo -->
+                            <div class="form-check form-check-inline" style="position: absolute;top: 2px; right: 350px;" title="pendiete">
+                                <input class="form-check-input" type="checkbox" id="seleccionadoAmarillo_@tarea.IdTarea" style="background-color: orange; width: 20px; height: 20px; border: none;" data-idestado="2" onchange="guardarEstado(this)">
+                            </div>
+                            <!-- Cuadro de selección rojo -->
+                            <div class="form-check form-check-inline" style="position: absolute;top: 2px; right: 400px;" title="importante">
+                                <input class="form-check-input" type="checkbox" id="seleccionadoRojo_@tarea.IdTarea" style="background-color: red; width: 20px; height: 20px; border: none;" data-idestado="1" onchange="guardarEstado(this)">
+                            </div>
+                            <!-- Switch -->
+                            <div class="form-check form-switch switch-container" style="position: absolute; top: 120px; right: 620px;">
+                                <input class="form-check-input switch" type="checkbox" id="flexSwitchCheck_@tarea.IdTarea" data-idtarea="@tarea.IdTarea">
+                                <label class="form-check-label" for="flexSwitchCheck_@tarea.IdTarea"></label>
+                            </div>
+
+
+
+                            <!-- Botón de eliminar -->
+                            <a class="btn eliminar-btn" style="position: absolute; top: -5px; right: -7px;" onclick="return confirm('¿Estás seguro que deseas eliminar esta tarea?');"
+                               href="@Url.Action("Delete", "Tarea", new { idTarea = tarea.IdTarea })">
+                                <img src="~/IMG/eliminar.png" alt="Eliminar" style="width: 27px; height: 27px;" />
+                            </a>
+
+                            <!-- Botón de editar -->
+                            <a class="btn editar-btn" style="position: absolute; top: -5px; right: 35px;" onclick="editarTarea('@tarea.IdTarea', '@tarea.Titulo', '@tarea.Descripcion', '@( tarea.FechaVencimiento)', '@tarea.IdEstado')">
+                                <img src="~/IMG/editar.png" alt="Editar" style="width: 27px; height: 27px;" />
+                            </a>
+
+                            <h3 class="task-title">@tarea.Titulo</h3>
+                            <p class="task-description">@tarea.Descripcion</p>
+                            @if (tarea.FechaVencimiento != null)
+                            {
+                                <p class="task-due">Vence el @tarea.FechaVencimiento</p>
+                            }
+                           <span class="task-label">@tarea.IdEstado</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <!-- Formulario para agregar o editar tarea -->
+                <div class="task-container">
+                    <h4>Update/Add Task</h4>
+                    @using (Html.BeginForm("GetAll", "Tarea", FormMethod.Post, new { @class = "form-horizontal" }))
+                    {
+                        <!-- campos necesarios para agregar/editar una tarea -->
+                        <input type="hidden" id="idTarea" name="IdTarea" /> <!-- Campo oculto para almacenar el ID de la tarea -->
+                        <div class="form-group">
+                            <label for="titulo" class="col-sm-3 control-label">Título:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" id="titulo" name="Titulo" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="descripcion" class="col-sm-3 control-label">Descripción:</label>
+                            <div class="col-sm-11">
+                                <textarea class="form-control" id="descripcion" name="Descripcion"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha" class="col-sm-4 control-label">Fecha de Vencimiento:</label>
+                            <div class="col-sm-11">
+                                <input type="datetime-local" class="form-control" id="fecha" name="FechaVencimiento" />
+                            </div>
+                        </div>
+
+
+                       <div class="form-group">
+                            <label for="estado" class="col-sm-3 control-label">Estado:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" id="estado" name="IdEstado">
+                            </div>
+                        </div>
+
+                       
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-3">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editarTarea(idTarea, titulo, descripcion, fechaVencimiento, idEstado) {
+            document.getElementById('idTarea').value = idTarea;
+            document.getElementById('titulo').value = titulo;
+            document.getElementById('descripcion').value = descripcion;
+            document.getElementById('fecha').value = fechaVencimiento;
+            document.getElementById('estado').value = idEstado;
+        }
+    </script>
+
+    <script>
+        $(function () {
+            $('#datetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD HH:mm:ss'
+            });
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('input[type="checkbox"]').change(function () {
+                var idTarea = $(this).attr('id').split('_')[1]; // Obtener el id de la tarea
+                var idEstado = $(this).data('idestado'); // Obtener el id del estado asociado al checkbox
+
+                // Envía una solicitud AJAX para actualizar el idEstado de la tarea en la base de datos
+                $.ajax({
+                    url: '/Tarea/ActualizarEstado', // Ruta de la acción que actualizará el estado de la tarea
+                    method: 'POST',
+                    data: { idTarea: idTarea, idEstado: idEstado },
+                    success: function (result) {
+                        
+                        console.log(result);
+                    },
+                    error: function (error) {
+                        
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+    @*// Funcion del para guardar el estado de la tarea  recuadros*@
+    <script>
+        // Esta Función para guardar el estado de la selección en una cookie
+        function guardarEstado(checkbox) {
+            var id = checkbox.id;
+            var isChecked = checkbox.checked;
+            document.cookie = id + "=" + isChecked + "; path=/";
+        }
+
+        // Esta Función para restaurar el estado de la selección desde las cookies al cargar la página
+        window.onload = function () {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function (checkbox) {
+                var isChecked = getCookie(checkbox.id);
+                if (isChecked === "true") {
+                    checkbox.checked = true;
+                }
+            });
+        };
+
+        //Esta Función para obtener el valor de una cookie por su nombre
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+    </script>
+
+
+      @*// Funcion del switch desde la cookie*@
+    <script>
+        $(document).ready(function () {
+            // Al cargar la página, restaurar el estado del switch 
+            $('.switch-container').each(function () {
+                var idTarea = $(this).find('.switch').data('idtarea');
+                var isChecked = getCookie('switch_' + idTarea);
+                if (isChecked === "true") {
+                    $(this).find('.switch').prop('checked', true);
+                    $(this).css('background-color', '#6C1107 '); // Aplicar el color rojo a la tarea si está activo
+                }
+            });
+
+            // Maneja el cambio de estado del switch
+            $('.switch').change(function () {
+                var idTarea = $(this).data('idtarea');
+                var isChecked = $(this).prop('checked');
+                guardarEstado(idTarea, isChecked);
+                if (isChecked) {
+                    $(this).closest('.task').css('background-color', '#6C1107 '); // Aplica el estilo rojo a la tarea si está activo
+                } else {
+                    $(this).closest('.task').css('background-color', 'rgba(255, 255, 255, 0.1)'); // Restaura el estilo original de la tarea si está desactivado
+                }
+            });
+
+            // Función para guardar el estado del switch 
+            function guardarEstado(idTarea, isChecked) {
+                document.cookie = 'switch_' + idTarea + '=' + isChecked + '; path=/';
+            }
+
+            // Función para obtener el valor 
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+            }
+
+            // Al cargar la página, ajusta el estilo de la tarea según el estado del switch
+            $('.task').each(function () {
+                var switchContainer = $(this).find('.switch-container');
+                var isChecked = switchContainer.find('.switch').prop('checked');
+                if (isChecked) {
+                    $(this).css('background-color', '#6C1107 '); // Aplica el estilo rojo a la tarea si está activo
+                } else {
+                    $(this).css('background-color', 'rgba(255, 255, 255, 0.1)'); // Restaura el estilo original de la tarea si está desactivado
+                }
+            });
+        });
+    </script>
+
+
+</body>
+</html>
